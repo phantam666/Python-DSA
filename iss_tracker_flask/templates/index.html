@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ISS Tracker</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #map { height: 500px; width: 80%; margin: 20px auto; }
+        .info { margin: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🛰️ ISS Tracker</h1>
+    <div class="info">
+        <p>There are currently <strong>{{ count }}</strong> astronauts aboard the ISS:</p>
+        <ul>
+            {% for person in astronauts %}
+                <li>{{ person.name }}</li>
+            {% endfor %}
+        </ul>
+
+        {% if user_location %}
+            <p>Your approximate location: {{ user_location[0] }}, {{ user_location[1] }}</p>
+        {% else %}
+            <p>Could not determine your location.</p>
+        {% endif %}
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        const map = L.map('map').setView([0, 0], 2);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        const issIcon = L.icon({
+            iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d0/International_Space_Station.svg',
+            iconSize: [50, 32],
+            iconAnchor: [25, 16]
+        });
+
+        const issMarker = L.marker([0, 0], {icon: issIcon}).addTo(map);
+
+        async function updateISS() {
+            const res = await fetch('/iss');
+            const data = await res.json();
+            const lat = data.latitude;
+            const lon = data.longitude;
+
+            issMarker.setLatLng([lat, lon]);
+            map.panTo([lat, lon]);
+        }
+
+        updateISS();
+        setInterval(updateISS, 5000);
+    </script>
+</body>
+</html>

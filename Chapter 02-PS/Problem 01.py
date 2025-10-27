@@ -1,0 +1,12 @@
+a = int(input("number : "))
+b = int(input("number : "))
+
+print("Number 1: ", a)
+print("Number 2: ", b)
+print (a + b)
+print (a - b)
+print (a * b)
+print (a / b)   
+print (a % b)
+print (a ** b)
+print (a // b)
